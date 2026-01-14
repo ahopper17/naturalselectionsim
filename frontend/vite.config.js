@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Base path for GitHub Pages - change if your repo name is different
+  base: '/naturalselectionsim/',
   server: {
     port: 5173,
     proxy: {

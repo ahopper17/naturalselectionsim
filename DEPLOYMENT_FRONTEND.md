@@ -28,11 +28,34 @@ Vercel will auto-deploy on every push to your repo.
    - `VITE_API_URL` = `https://your-backend.onrender.com`
 6. **Deploy**
 
-### Option 3: GitHub Pages
+### Option 3: GitHub Pages (Your Preferred Method)
 
-1. Update `vite.config.js` to set `base: '/your-repo-name/'`
-2. Build: `npm run build`
-3. Deploy `dist/` folder to `gh-pages` branch
+#### Automatic Deployment (Recommended)
+
+1. **Enable GitHub Actions**: The workflow file is already set up at `.github/workflows/deploy-frontend.yml`
+2. **Set GitHub Secret** (optional but recommended):
+   - Go to your repo → Settings → Secrets and variables → Actions
+   - Add a new secret: `VITE_API_URL` = `https://your-backend.onrender.com`
+   - If you don't set this, update the workflow file with your backend URL
+3. **Enable GitHub Pages**:
+   - Go to your repo → Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: `gh-pages` → `/ (root)`
+   - Save
+4. **Push to main**: Every push to `main` that changes `frontend/` will auto-deploy!
+
+#### Manual Deployment
+
+If you prefer manual deployment:
+
+```bash
+cd frontend
+npm install
+npm run build
+npx gh-pages -d dist
+```
+
+Your site will be at: `https://ahopper17.github.io/naturalselectionsim/`
 
 ## Environment Variables
 
