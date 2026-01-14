@@ -1,0 +1,76 @@
+.grid-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: grid;
+  gap: 1px;
+  padding: 0.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.cell {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 0.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  display: block;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease;
+}
+
+.cell.food {
+  /* Food color and shadow are set inline based on amount */
+}
+
+.cell.organism {
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Food shadow will be added inline when food is present */
+}
+
+.cell.organism:hover {
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+  z-index: 10;
+  position: relative;
+}
+
+.cell.dying {
+  z-index: 20;
+  position: relative;
+  animation: deathPulse 0.3s ease-out infinite;
+  transition: all 0.1s ease-out;
+}
+
+@keyframes deathPulse {
+  0%, 100% {
+    box-shadow: 0 0 3px rgba(139, 0, 0, 0.8), 0 0 6px rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 6px rgba(139, 0, 0, 1), 0 0 12px rgba(255, 0, 0, 0.6);
+  }
+}
+
+.trait-value {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}

@@ -19,7 +19,7 @@ REPRO_CHANCE = 0.25
 MUTATION_CHANCE = 0.05
 
 # SELECT TRAIT FOR SIMULATION
-TRAIT_NAME = "efficiency"  # Options: "speed", "efficiency", "vision", "strength"
+TRAIT_NAME = "speed"  # Options: "speed", "efficiency", "vision", "strength"
 
 # TRAIT-SPECIFIC SETTINGS
 TRAIT_POSSIBLE_VALUES = {
@@ -74,4 +74,4 @@ POSSIBLE_TRAIT_VALUES = TRAIT_POSSIBLE_VALUES[TRAIT_NAME]
 
 # DEV SETTINGS
 SIMULATION_STEPS = 50
-DEATH_ANIMATION_FRAMES = 5
+DEATH_ANIMATION_FRAMES = 6  # Quicker death animation

@@ -64,8 +64,10 @@ class Organism:
     def eat(self, world):
         x,y = self.x, self.y
         if world.food[y][x] > 0:
-            self.energy += world.food[y][x]
+            food_eaten = world.food[y][x]
+            self.energy += food_eaten
             world.food[y][x] = 0
+            print(f"Organism at ({x}, {y}) ate {food_eaten} food, energy now: {self.energy}")
 
     #Asexually reproduce if certain conditions are met
     def reproduce(self, world):
@@ -107,6 +109,7 @@ class Organism:
                             mutated_value = min(current_value + 1, mutation_settings["max"])
                         elif isinstance(current_value, float):
                             mutated_value = min(current_value + mutation_settings["step"], mutation_settings["max"])
+                        print(f"MUTATION! Parent speed: {current_value}, Offspring speed: {mutated_value}")
 
                 #Create offspring with potentially mutated trait
                     # Use current values

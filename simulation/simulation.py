@@ -20,17 +20,32 @@ def build_organism(x, y, energy):
     efficiency = mutable_val if trait_name == "efficiency" else 1.0
     return Organism(x, y, speed=speed, energy=energy, efficiency=efficiency)
 
+def initialize_organisms():
+    """Initialize organisms on the grid in random locations"""
+    global organisms, dead_organisms, occupied_positions, world
+    organisms.clear()
+    dead_organisms.clear()
+    occupied_positions.clear()
+    
+    for _ in range(config.NUM_ORGANISMS):
+        while True:
+            x = random.randint(0, config.WIDTH - 1)
+            y = random.randint(0, config.HEIGHT - 1)
+            #Check if position occupied, if not place organism
+            if (x, y) not in occupied_positions:
+                organisms.append(build_organism(x, y, config.STARTING_ENERGY))
+                world.place_organism(x, y)
+                occupied_positions.add((x, y))
+                break
+
+def reset_simulation():
+    """Reset the simulation to initial state"""
+    global world, organisms, dead_organisms, occupied_positions
+    world = World(config.WIDTH, config.HEIGHT, config.FOOD_NUMBER)
+    initialize_organisms()
+
 #Initialize organisms on the grid in random locations
-for _ in range(config.NUM_ORGANISMS):
-    while True:
-        x = random.randint(0, config.WIDTH - 1)
-        y = random.randint(0, config.HEIGHT - 1)
-        #Check if position occupied, if not place organism
-        if (x, y) not in occupied_positions:
-            organisms.append(build_organism(x,y, config.STARTING_ENERGY))
-            world.place_organism(x, y)
-            occupied_positions.add((x, y))
-            break
+initialize_organisms()
 
 #Get the distribution of the tested trait
 def get_trait_distribution(trait_name, possible_values):
@@ -47,13 +62,19 @@ def get_trait_distribution(trait_name, possible_values):
 
 #Run it!
 def simulate():
-    global organisms, dead_organisms
+    global organisms, dead_organisms, world
 
     #End if all organisms die
     if not organisms:
         return False
 
+    # Clear the world grid before processing organisms
+    for y in range(world.height):
+        for x in range(world.width):
+            world.grid[y][x] = None
+
     live_organisms = []
+    new_offspring = []  # Collect offspring separately to avoid modifying list while iterating
 
     #All organisms will...
     for org in organisms:
@@ -65,19 +86,52 @@ def simulate():
 
         #Or die.
         if org.check_survival(world):
-            world.place_organism(org.x, org.y)
+            # Check if position is empty before placing (should be after move)
+            if world.is_empty(org.x, org.y):
+                world.place_organism(org.x, org.y)
+            else:
+                print(f"WARNING: Organism at ({org.x}, {org.y}) tried to occupy non-empty cell!")
 
             # Handle reproduction
             offspring = org.reproduce(world)
             if offspring:
-                organisms.append(offspring)
-                world.place_organism(offspring.x, offspring.y)
+                new_offspring.append(offspring)
+                if world.is_empty(offspring.x, offspring.y):
+                    world.place_organism(offspring.x, offspring.y)
+                    print(f"New offspring born at ({offspring.x}, {offspring.y}) with speed {offspring.speed}")
+                else:
+                    print(f"WARNING: Offspring at ({offspring.x}, {offspring.y}) tried to occupy non-empty cell!")
 
             live_organisms.append(org)
         else:
-            dead_organisms.append({'x': org.x, 'y': org.y, 'frames_left': config.DEATH_ANIMATION_FRAMES})
+            # Organism died - clear its position but keep it for death animation
+            trait_value = getattr(org, config.TRAIT_NAME)
+            world.clear(org.x, org.y)
+            dead_organisms.append({
+                'x': org.x, 
+                'y': org.y, 
+                'frames_left': config.DEATH_ANIMATION_FRAMES,
+                'trait': int(trait_value)  # Store trait for death animation
+            })
+            print(f"Organism died at ({org.x}, {org.y})")
 
-    organisms = live_organisms
+    # Add new offspring to the organisms list (modify in-place to update global)
+    organisms.clear()
+    organisms.extend(live_organisms)
+    organisms.extend(new_offspring)
+    
+    # Debug: verify speed distribution after adding offspring
+    if new_offspring:
+        print(f"Added {len(new_offspring)} new offspring. Total organisms now: {len(organisms)}")
+        for off in new_offspring:
+            print(f"  - Offspring at ({off.x}, {off.y}) with speed {off.speed}")
+    
+    # Debug: final speed distribution
+    final_speeds = {}
+    for org in organisms:
+        speed = getattr(org, config.TRAIT_NAME)
+        final_speeds[speed] = final_speeds.get(speed, 0) + 1
+    print(f"Final organisms by speed in simulate(): {final_speeds}")
 
     #Update dead organism animations
     for corpse in dead_organisms:
