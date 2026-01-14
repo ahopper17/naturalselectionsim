@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import './Settings.css'
 
-const API_BASE = 'http://localhost:5001'
+// Use environment variable or default to localhost for development
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 function Settings({ onConfigChange }) {
   const [settings, setSettings] = useState({

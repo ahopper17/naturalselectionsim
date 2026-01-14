@@ -5,8 +5,8 @@ import Controls from './components/Controls'
 import Stats from './components/Stats'
 import Settings from './components/Settings'
 
-// API base URL - in development, call Flask directly
-const API_BASE = 'http://localhost:5001'
+// API base URL - use environment variable in production, localhost in development
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 function App() {
   const [simulationState, setSimulationState] = useState({

@@ -32,9 +32,18 @@ This guide covers how to deploy the Natural Selection Simulator so the Python ba
 
 1. **Create new Web Service** on Render
 2. **Connect your GitHub repo**
-3. **Build Command**: `pip install -r requirements.txt`
+3. **Build Command**: `pip install --upgrade pip && pip install -r requirements.txt`
 4. **Start Command**: `gunicorn --config gunicorn_config.py app:app`
-5. **Deploy**
+5. **Environment Variables** (optional):
+   - `FLASK_ENV=production`
+   - `PYTHON_VERSION=3.11.0`
+6. **Deploy**
+
+**Note**: If gunicorn is not found, try using the full path:
+- **Start Command**: `python -m gunicorn --config gunicorn_config.py app:app`
+
+Or use the Procfile (Render should auto-detect it):
+- Render will automatically use the `Procfile` if present
 
 ## Option 2: VPS with systemd (More Control)
 
