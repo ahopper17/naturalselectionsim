@@ -1,57 +1,64 @@
-# GitHub Pages Deployment Setup
+# GitHub Pages Deployment
 
-## Quick Setup Steps
+The simulator now runs entirely in the browser — no backend, no secrets,
+no hosting costs. You just need GitHub Pages enabled.
 
-1. **Get your Render backend URL**
-   - It should look like: `https://natural-selection-sim-xxxx.onrender.com`
-   - Copy this URL
+## One-time setup
 
-2. **Set GitHub Secret** (for automatic deployment):
-   - Go to: https://github.com/ahopper17/naturalselectionsim/settings/secrets/actions
-   - Click "New repository secret"
-   - Name: `VITE_API_URL`
-   - Value: Your Render backend URL (e.g., `https://natural-selection-sim-xxxx.onrender.com`)
-   - Click "Add secret"
+1. **Push the repo to GitHub** (if it isn't already).
+2. **Enable GitHub Pages**:
+   - Go to your repo's `Settings` → `Pages`.
+   - Source: `Deploy from a branch`.
+   - Branch: `gh-pages` → `/ (root)`. (The branch will be created the
+     first time the workflow runs.)
+   - Save.
+3. **Confirm the base path**:
+   - `frontend/vite.config.js` has `base: '/naturalselectionsim/'`.
+   - This must match your repo name. If your repo is named differently
+     (e.g. `evolution-sim`), change `base` to `/evolution-sim/`.
 
-3. **Enable GitHub Pages**:
-   - Go to: https://github.com/ahopper17/naturalselectionsim/settings/pages
-   - Source: "Deploy from a branch"
-   - Branch: `gh-pages` → `/ (root)`
-   - Click "Save"
+## Deploying
 
-4. **Push your changes**:
-   ```bash
-   git add .
-   git commit -m "Setup GitHub Pages deployment"
-   git push origin main
-   ```
+Two options — pick one.
 
-5. **Wait for deployment**:
-   - Go to: https://github.com/ahopper17/naturalselectionsim/actions
-   - You should see a workflow running
-   - Once it completes, your site will be live at:
-     `https://ahopper17.github.io/naturalselectionsim/`
+### Option A: Push to `main` (automatic)
 
-## Manual Deployment (Alternative)
+Every push to `main` that touches `frontend/**` triggers
+`.github/workflows/deploy-frontend.yml`, which builds and publishes to the
+`gh-pages` branch.
 
-If you prefer to deploy manually:
+```bash
+git add .
+git commit -m "Update simulator"
+git push origin main
+```
+
+Watch progress at `https://github.com/<you>/<repo>/actions`.
+
+### Option B: Manual deploy from your laptop
 
 ```bash
 cd frontend
-npm install
-VITE_API_URL=https://your-backend.onrender.com npm run build
-npx gh-pages -d dist
+npm install     # only the first time, after the package.json changes
+npm run deploy  # builds and pushes dist/ to the gh-pages branch
 ```
 
-## Updating the Site
+## Live URL
 
-After the initial setup, just push to `main`:
-- Any changes to `frontend/` will trigger automatic deployment
-- The workflow will build and deploy to GitHub Pages
-- Your site will update automatically (may take 1-2 minutes)
+After the first successful deploy, the site is live at:
+
+```
+https://<your-github-user>.github.io/naturalselectionsim/
+```
+
+Linking it from your personal site is just an anchor tag — no API keys,
+no CORS, nothing fancy.
 
 ## Troubleshooting
 
-- **404 errors**: Make sure GitHub Pages is enabled and using the `gh-pages` branch
-- **API not connecting**: Check that `VITE_API_URL` secret is set correctly
-- **Build fails**: Check the Actions tab for error messages
+- **Blank page / 404 on assets**: the `base` path in `vite.config.js`
+  doesn't match your repo name.
+- **Workflow fails on `npm ci`**: commit `frontend/package-lock.json` so
+  CI has something deterministic to install from.
+- **Old version still showing**: GitHub Pages caches aggressively; a hard
+  refresh (Cmd-Shift-R) usually fixes it.

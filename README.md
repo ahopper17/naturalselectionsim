@@ -1,50 +1,58 @@
 # Natural Selection Simulator
 
-A natural selection simulator with a modern React frontend and Python Flask backend.
+A small evolutionary simulation that runs entirely in the browser. Organisms
+wander a grid, eat food, reproduce, mutate, and starve. Watch the
+distribution of a trait (speed or efficiency) shift generation after
+generation under selection pressure.
 
-## Quick Start
+Live: https://ahopper17.github.io/naturalselectionsim/
 
-### Backend Setup
+## Getting started
+
 ```bash
-# Activate virtual environment
-source venv/bin/activate
-
-# Install dependencies (if not already installed)
-pip install -r requirements.txt
-
-# Run Flask backend
-python app.py
-```
-Backend runs on `http://localhost:5000`
-
-### Frontend Setup
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
-Frontend runs on `http://localhost:5173`
 
-Visit `http://localhost:5173` to see the simulation!
+Then open http://localhost:5173.
 
-## Project Structure
+## Building / deploying
 
-- `app.py` - Flask backend API
-- `simulation/` - Python simulation logic
-- `frontend/` - Vite + React frontend
+```bash
+npm run build     # produces dist/
+npm run deploy    # builds and pushes dist/ to the gh-pages branch
+```
 
-## Features
+See [GITHUB_PAGES_SETUP.md](./GITHUB_PAGES_SETUP.md) for the full deploy
+workflow (automatic via GitHub Actions on every push to `main`).
 
-- Real-time natural selection simulation
-- Interactive controls (Step, Run, Pause, Reset)
-- Trait distribution visualization
-- Modern React UI with smooth animations
+## Project layout
 
-## Migration
+```
+├── src/
+│   ├── components/           React UI
+│   │   ├── Controls.jsx
+│   │   ├── SimulationGrid.jsx
+│   │   ├── Settings.jsx
+│   │   └── Stats.jsx
+│   ├── sim/                  Simulation logic (pure JS, no DOM)
+│   │   ├── config.js
+│   │   ├── world.js
+│   │   ├── organism.js
+│   │   ├── simulation.js
+│   │   └── rand.js
+│   ├── App.jsx
+│   └── main.jsx
+├── index.html
+├── vite.config.js
+└── python-original/          Original Python + Flask implementation
+                              (kept for reference, no longer used)
+```
 
-If you're migrating from the old Flask template version, see [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for details.
+## About the port
+
+The simulation was originally written in Python, served by a Flask
+backend with a separate React frontend. It has since been ported to pure
+JavaScript so the whole thing runs client-side — no backend, no hosting
+costs, trivial to deploy as a static site. The original Python source
+is preserved under `python-original/`.
