@@ -1,8 +1,41 @@
 .app {
   padding: 2.5rem 2rem 4rem;
-  max-width: 1100px;
+  /* Bumped from 1100px to 1300px so the grid (25 cells × 25px ≈ 650px
+     with its padding) and the population graph can sit side-by-side
+     with breathing room. */
+  max-width: 1300px;
   margin: 0 auto;
   position: relative;
+}
+
+/* Grid + population graph live in the same flex row on wide screens.
+   flex-wrap: wrap lets them stack on narrow screens without a media query.
+   align-items: stretch keeps the graph card the same height as the grid
+   container so the row doesn't look lopsided. */
+.sim-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.25rem;
+  margin: 1rem auto;
+}
+
+/* Grid stays at its natural fit-content width; cancel the default
+   auto-centering margin since it's now a flex item. */
+.sim-row > .grid-container {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* Graph takes whatever width is left, with a minimum so it doesn't
+   crush to nothing when the wrap breakpoint is near. When the row
+   wraps to a column (narrow screen), it expands to full width. */
+.sim-row > .population-graph {
+  margin: 0;
+  flex: 1 1 360px;
+  max-width: none;
+  min-width: 320px;
 }
 
 .app-header {
@@ -10,12 +43,11 @@
 }
 
 .app-header h1 {
-  color: white;
+  color: var(--text-primary);
   font-size: clamp(2rem, 4vw, 2.75rem);
   margin: 0 0 0.5rem 0;
   font-weight: 700;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 .app-header .subtitle {

@@ -1,76 +1,177 @@
+/* The grid has two overlapping layers inside a positioned wrapper:
+     1. .food-grid — static grid of cells, each renders a food dot
+     2. .organism-layer — absolutely-positioned organism divs keyed by id
+   The wrapper's width/height are set inline to match the grid size in px,
+   so the organism layer can place things at (x*cellSize, y*cellSize). */
+
 .grid-container {
   display: flex;
   justify-content: center;
   margin: 1rem auto;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  width: fit-content;
+  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(76, 60, 42, 0.05);
+}
+
+.grid-wrapper {
+  position: relative;
+  background: rgba(255, 252, 245, 0.45);
   border-radius: 8px;
-  backdrop-filter: blur(10px);
-  width: fit-content;
-  box-sizing: border-box;
+  overflow: hidden; /* clip the bloom during death animation */
 }
 
-.grid {
+/* -------- food layer -------- */
+
+.food-grid {
   display: grid;
-  gap: 1px;
-  padding: 0.25rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  width: fit-content;
-  margin: 0 auto;
+  gap: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.cell {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  min-height: 16px;
-  max-width: 16px;
-  max-height: 16px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 0.5px solid rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
-  display: block;
+.food-cell {
+  position: relative;
   box-sizing: border-box;
-  transition: background-color 0.15s ease;
+  border: 0.5px solid rgba(107, 144, 128, 0.08);
+  /* Smooth fade as food depletes (organism eats) and regrows (0.2/step).
+     Without the transition, +0.2 of opacity per step reads as nothing. */
+  transition: background-color 0.4s ease-out;
 }
 
-.cell.food {
-  /* Food color and shadow are set inline based on amount */
+/* -------- organism layer -------- */
+
+.organism-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* doesn't intercept clicks on the grid */
 }
 
-.cell.organism {
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  /* Food shadow will be added inline when food is present */
+/* The slot handles POSITION (translate). It's the thing that moves across
+   cells, so its transition is what makes smooth translation possible.
+   The duration is tuned to default sim speed (~200ms/step). */
+.organism-slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  transition: transform 0.22s cubic-bezier(0.5, 0.1, 0.4, 1);
 }
 
-.cell.organism:hover {
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+/* The rotator (outer .organism) handles facing direction. The inner
+   .organism-body handles the visible circle and its scale animations
+   (breathing and death). Splitting the two transforms across nested
+   elements lets rotation and scale coexist instead of overwriting each
+   other — a CSS keyframe on one div doesn't fight with inline styles
+   on the other. */
+.organism {
+  position: absolute;
+  border-radius: 50%;
+  /* Smooth rotation when facing direction changes. */
+  transition: transform 0.25s ease-out;
+  will-change: transform;
+}
+
+.organism.dying {
   z-index: 10;
-  position: relative;
 }
 
-.cell.dying {
-  z-index: 20;
-  position: relative;
-  animation: deathPulse 0.3s ease-out infinite;
-  transition: all 0.1s ease-out;
+.organism-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* Idle breathing: a subtle scale pulse that runs continuously. Each
+     organism's animation-delay is offset by --anim-offset (set inline
+     from the organism's id) so they breathe out of phase with each
+     other. Disabled during death, where the inline transform takes over. */
+  animation: breathe 3.4s ease-in-out infinite;
+  animation-delay: var(--anim-offset, 0s);
+  transition: opacity 0.3s ease-out, filter 0.3s ease-out,
+              box-shadow 0.3s ease-out, transform 0.25s ease-out;
+  will-change: transform, opacity;
 }
 
-@keyframes deathPulse {
-  0%, 100% {
-    box-shadow: 0 0 3px rgba(139, 0, 0, 0.8), 0 0 6px rgba(255, 0, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 6px rgba(139, 0, 0, 1), 0 0 12px rgba(255, 0, 0, 0.6);
-  }
+.organism.dying .organism-body {
+  /* Inline transform drives the death scale curve, so the idle breathing
+     animation gets out of the way. Box-shadow transition is faster here
+     so the expanding halo keeps up with per-frame updates. */
+  animation: none;
+  transition: opacity 0.25s ease-out,
+              transform 0.25s ease-out,
+              filter 0.25s ease-out,
+              box-shadow 0.2s ease-out;
 }
 
-.trait-value {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: white;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* -------- eyes -------- */
+/* Two dots near the top of the unrotated circle. The .organism parent's
+   rotate() points them in the facing direction; the .organism-body
+   parent's breathe() scale makes them pulse along with the body. */
+.eye {
+  position: absolute;
+  width: 20%;
+  height: 20%;
+  top: 18%;
+  background: rgba(25, 22, 18, 0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  transform-origin: center;
+  /* Blink: one quick close+open in the tail of each cycle, then idle.
+     Shares --anim-offset with breathing so each organism has one rhythm. */
+  animation: blink 5s infinite;
+  animation-delay: var(--anim-offset, 0s);
+  transition: transform 0.12s ease-out;
+}
+
+.eye-left  { left: 22%; }
+.eye-right { right: 22%; }
+
+@keyframes blink {
+  0%, 94%, 97%, 100% { transform: scaleY(1); }
+  95%, 96%           { transform: scaleY(0.12); }
+}
+
+/* Eating reaction: brief eye-widen the frame after consuming food. */
+.organism.ate .eye {
+  transform: scale(1.35);
+}
+
+/* Reproduction indicator is applied inline from SimulationGrid.jsx because
+   bodyShadow is set via inline style — a class-level rule here would get
+   overridden by specificity. See the `reproduced` branch in Organism. */
+
+/* When dying, eyes close completely and stay closed — overrides blink. */
+.organism.dying .eye {
+  animation: none;
+  transform: scaleY(0.12);
+}
+
+/* -------- debug: energy label -------- */
+/* Lives on the organism-slot (not inside .organism) so it doesn't inherit
+   the rotation or the breathing scale — stays perfectly upright and still
+   for quick reading. Font-size is set inline to scale with cellSize. */
+.energy-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 700;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 5;
+  line-height: 1;
+  white-space: nowrap;
 }

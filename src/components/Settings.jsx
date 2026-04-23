@@ -61,100 +61,107 @@ function Settings({ onConfigChange, onApply }) {
 
       {isOpen && (
         <div className="settings-panel">
-          <h3>Simulation Settings</h3>
+          <h3>Simulation</h3>
           <p className="settings-hint">
             Changes apply when you click <strong>Apply &amp; Reset</strong>.
           </p>
 
-          <div className="settings-group">
-            <label>
-              Trait under selection
-              <select
-                value={settings.trait_name}
-                onChange={(e) => handleChange('trait_name', e.target.value)}
-              >
-                <option value="speed">Speed</option>
-                <option value="efficiency">Efficiency</option>
-              </select>
-            </label>
-          </div>
+          {/* TRAIT — what's being selected for */}
+          <section className="settings-section">
+            <h4>Selection</h4>
+            <div className="settings-group">
+              <label>
+                Trait under selection
+                <select
+                  value={settings.trait_name}
+                  onChange={(e) => handleChange('trait_name', e.target.value)}
+                >
+                  <option value="speed">Speed</option>
+                  <option value="efficiency">Efficiency</option>
+                </select>
+              </label>
+            </div>
+            <div className="settings-group">
+              <label>
+                Mutation rate: <span className="value">{(settings.mutation_chance * 100).toFixed(1)}%</span>
+                <input
+                  type="range" min="0" max="0.5" step="0.01"
+                  value={settings.mutation_chance}
+                  onChange={(e) => handleChange('mutation_chance', parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+          </section>
 
-          <div className="settings-group">
-            <label>
-              Starting Food: <span className="value">{settings.food_number}</span>
-              <input
-                type="range" min="50" max="500" step="10"
-                value={settings.food_number}
-                onChange={(e) => handleChange('food_number', parseInt(e.target.value, 10))}
-              />
-            </label>
-          </div>
+          {/* POPULATION — starting conditions */}
+          <section className="settings-section">
+            <h4>Population</h4>
+            <div className="settings-group">
+              <label>
+                Starting organisms: <span className="value">{settings.num_organisms}</span>
+                <input
+                  type="range" min="5" max="100" step="5"
+                  value={settings.num_organisms}
+                  onChange={(e) => handleChange('num_organisms', parseInt(e.target.value, 10))}
+                />
+              </label>
+            </div>
+            <div className="settings-group">
+              <label>
+                Starting energy: <span className="value">{settings.starting_energy}</span>
+                <input
+                  type="range" min="5" max="50" step="1"
+                  value={settings.starting_energy}
+                  onChange={(e) => handleChange('starting_energy', parseInt(e.target.value, 10))}
+                />
+              </label>
+            </div>
+            <div className="settings-group">
+              <label>
+                Food sources: <span className="value">{settings.food_number}</span>
+                <input
+                  type="range" min="50" max="500" step="10"
+                  value={settings.food_number}
+                  onChange={(e) => handleChange('food_number', parseInt(e.target.value, 10))}
+                />
+              </label>
+            </div>
+          </section>
 
-          <div className="settings-group">
-            <label>
-              Starting Organisms: <span className="value">{settings.num_organisms}</span>
-              <input
-                type="range" min="5" max="100" step="5"
-                value={settings.num_organisms}
-                onChange={(e) => handleChange('num_organisms', parseInt(e.target.value, 10))}
-              />
-            </label>
-          </div>
-
-          <div className="settings-group">
-            <label>
-              Starting Energy: <span className="value">{settings.starting_energy}</span>
-              <input
-                type="range" min="5" max="50" step="1"
-                value={settings.starting_energy}
-                onChange={(e) => handleChange('starting_energy', parseInt(e.target.value, 10))}
-              />
-            </label>
-          </div>
-
-          <div className="settings-group">
-            <label>
-              Reproduction Threshold: <span className="value">{settings.reproduction_energy_threshold}</span>
-              <input
-                type="range" min="10" max="50" step="1"
-                value={settings.reproduction_energy_threshold}
-                onChange={(e) => handleChange('reproduction_energy_threshold', parseInt(e.target.value, 10))}
-              />
-            </label>
-          </div>
-
-          <div className="settings-group">
-            <label>
-              Chance Reproduction Threshold: <span className="value">{settings.chance_reproduction_threshold}</span>
-              <input
-                type="range" min="5" max="30" step="1"
-                value={settings.chance_reproduction_threshold}
-                onChange={(e) => handleChange('chance_reproduction_threshold', parseInt(e.target.value, 10))}
-              />
-            </label>
-          </div>
-
-          <div className="settings-group">
-            <label>
-              Reproduction Chance: <span className="value">{(settings.repro_chance * 100).toFixed(0)}%</span>
-              <input
-                type="range" min="0" max="1" step="0.05"
-                value={settings.repro_chance}
-                onChange={(e) => handleChange('repro_chance', parseFloat(e.target.value))}
-              />
-            </label>
-          </div>
-
-          <div className="settings-group">
-            <label>
-              Mutation Chance: <span className="value">{(settings.mutation_chance * 100).toFixed(1)}%</span>
-              <input
-                type="range" min="0" max="0.5" step="0.01"
-                value={settings.mutation_chance}
-                onChange={(e) => handleChange('mutation_chance', parseFloat(e.target.value))}
-              />
-            </label>
-          </div>
+          {/* REPRODUCTION — how babies happen */}
+          <section className="settings-section">
+            <h4>Reproduction</h4>
+            <div className="settings-group">
+              <label>
+                Guaranteed-reproduction energy: <span className="value">{settings.reproduction_energy_threshold}</span>
+                <input
+                  type="range" min="10" max="50" step="1"
+                  value={settings.reproduction_energy_threshold}
+                  onChange={(e) => handleChange('reproduction_energy_threshold', parseInt(e.target.value, 10))}
+                />
+              </label>
+            </div>
+            <div className="settings-group">
+              <label>
+                Chance-reproduction energy: <span className="value">{settings.chance_reproduction_threshold}</span>
+                <input
+                  type="range" min="5" max="30" step="1"
+                  value={settings.chance_reproduction_threshold}
+                  onChange={(e) => handleChange('chance_reproduction_threshold', parseInt(e.target.value, 10))}
+                />
+              </label>
+            </div>
+            <div className="settings-group">
+              <label>
+                Chance-reproduction odds: <span className="value">{(settings.repro_chance * 100).toFixed(0)}%</span>
+                <input
+                  type="range" min="0" max="1" step="0.05"
+                  value={settings.repro_chance}
+                  onChange={(e) => handleChange('repro_chance', parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+          </section>
 
           <button className="apply-button" onClick={handleApply}>
             Apply &amp; Reset

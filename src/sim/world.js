@@ -34,14 +34,18 @@ export class World {
     this.generateFoodGrid(numFood)
   }
 
-  // Sprinkle `numFood` food piles across the grid. Stacking on the same cell
-  // is allowed — that's faithful to the original Python behavior.
+  // Sprinkle `numFood` food piles across the grid. Placements that land on
+  // the same cell stack, but we cap at FOOD_MAX so no cell starts with more
+  // food than a source can hold during replenishment. (Without this, random
+  // collisions could produce cells with 10+ food, and an organism's first
+  // meal could push it over the reproduction threshold in a single bite.)
   generateFoodGrid(numFood) {
+    const { FOOD_MAX } = this.config
     for (let i = 0; i < numFood; i++) {
       const x = randInt(0, this.width - 1)
       const y = randInt(0, this.height - 1)
       const energy = randInt(1, 5)
-      this.food[y][x] += energy
+      this.food[y][x] = Math.min(FOOD_MAX, this.food[y][x] + energy)
       this.foodSources[y][x] = true
     }
   }

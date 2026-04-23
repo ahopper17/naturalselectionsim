@@ -2,66 +2,43 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-family: inherit;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: white;
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 3px rgba(76, 60, 42, 0.15);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.btn-primary {
-  background-color: #4caf50;
-  color: white;
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(76, 60, 42, 0.2);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+/* Colors come from palette variables defined in index.css. */
 
-.btn-secondary {
-  background-color: #2196f3;
-  color: white;
-}
+.btn-primary   { background: var(--btn-primary);   }
+.btn-primary:hover:not(:disabled)   { background: var(--btn-primary-hover); }
 
-.btn-secondary:hover:not(:disabled) {
-  background-color: #1976d2;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+.btn-secondary { background: var(--btn-secondary); }
+.btn-secondary:hover:not(:disabled) { background: var(--btn-secondary-hover); }
 
-.btn-warning {
-  background-color: #ff9800;
-  color: white;
-}
+.btn-warning   { background: var(--btn-warning);   }
+.btn-warning:hover:not(:disabled)   { background: var(--btn-warning-hover); }
 
-.btn-warning:hover:not(:disabled) {
-  background-color: #f57c00;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.btn-danger {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #d32f2f;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+.btn-danger    { background: var(--btn-danger);    }
+.btn-danger:hover:not(:disabled)    { background: var(--btn-danger-hover); }

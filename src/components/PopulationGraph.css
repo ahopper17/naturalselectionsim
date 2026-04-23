@@ -1,0 +1,123 @@
+/* Population-over-time chart. Same card treatment as the Conditions panel
+   so it reads as part of the same visual family. */
+
+.population-graph {
+  margin: 1.5rem auto 0;
+  max-width: 900px;
+  padding: 1.25rem 1.5rem 0.75rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(76, 60, 42, 0.06);
+  text-align: left;
+
+  /* Column layout so .graph-area can flex-fill the vertical space left
+     after the header — this is what makes the chart actually use the
+     card's full height when it's stretched to match the grid. */
+  display: flex;
+  flex-direction: column;
+}
+
+.population-graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.population-graph-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.population-graph-legend {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Plot row: Y-axis label column + plot column. align-items: stretch is
+   the flex default, so both columns have equal height — that's what
+   makes percent-positioned labels line up with the SVG gridlines. */
+.graph-area {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 180px;
+}
+
+.graph-y-axis {
+  flex: 0 0 34px;
+  position: relative;
+}
+
+.graph-y-label {
+  position: absolute;
+  right: 6px;
+  width: 28px;
+  text-align: right;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.graph-plot {
+  flex: 1 1 auto;
+  position: relative;
+  min-width: 0; /* allow shrinking below content width */
+}
+
+/* SVG fills the plot column completely. preserveAspectRatio="none" in
+   the JSX stretches the viewBox to match the plot column's aspect ratio,
+   whatever that is. Stroke distortion is prevented by the paths using
+   vector-effect="non-scaling-stroke". */
+.population-graph-svg {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.graph-gridline {
+  stroke: rgba(107, 144, 128, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+/* "time →" hint at the bottom right of the card, outside the plot area. */
+.graph-x-label {
+  align-self: flex-end;
+  margin: 0.25rem 0.25rem 0 0;
+  font-size: 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-muted);
+  pointer-events: none;
+  flex: 0 0 auto;
+}

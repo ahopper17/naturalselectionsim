@@ -1,0 +1,260 @@
+/* The Conditions panel is the main playground of the app —
+   the knobs that let the user explore natural selection. Lives directly
+   below the grid in the normal page flow (no fixed positioning). */
+
+.conditions {
+  margin: 2rem auto 0;
+  max-width: 900px;
+  padding: 1.75rem 2rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(76, 60, 42, 0.06);
+  text-align: left;
+}
+
+.conditions-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.conditions-header h2 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.conditions-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.conditions-header strong {
+  color: var(--accent);
+}
+
+/* Three-column layout on wide screens; collapses to one column on mobile. */
+.conditions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 760px) {
+  .conditions-grid { grid-template-columns: 1fr; }
+}
+
+.conditions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  background: rgba(255, 252, 245, 0.45);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+}
+
+.conditions-section h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-dark);
+}
+
+/* A single labeled slider or dropdown. */
+.knob {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.knob-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  /* Let the label text wrap to a new line if needed. The value uses
+     margin-left: auto so it stays flush right regardless of whether
+     we're on one row or two. Prevents the Reproduction section (with
+     its long "Guaranteed-reproduction energy" labels) from crushing
+     the value into the info icon. */
+  flex-wrap: wrap;
+  row-gap: 0.15rem;
+}
+
+.knob-label-text {
+  flex: 1 1 auto;
+  min-width: 0; /* let it shrink past its content to trigger wrap */
+}
+
+.knob-value {
+  margin-left: auto;
+}
+
+.knob-value {
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.knob input[type="range"] {
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(107, 144, 128, 0.2);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.knob input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(76, 60, 42, 0.25);
+  border: 2px solid #fff;
+  transition: transform 0.15s ease;
+}
+
+.knob input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.knob input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(76, 60, 42, 0.25);
+}
+
+.knob-select {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--panel-border);
+  background: rgba(255, 252, 245, 0.7);
+  color: var(--text-primary);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---- knob label structure: label text and an optional info icon ---- */
+
+.knob-label-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ---- info icon + tooltip ----
+   The icon is a tiny circle with an "i" inside. A hidden <span> sits
+   absolute-positioned above it and fades in on hover or keyboard focus.
+   The native `title` attribute is also set so long-press on mobile
+   devices shows the same text. */
+
+.info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.info-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-light);
+  color: var(--text-primary);
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Georgia', serif;  /* italic-looking "i" is nicer here */
+  font-style: italic;
+  cursor: help;
+  line-height: 1;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.info-icon:hover,
+.info-icon:focus {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.15);
+  outline: none;
+}
+
+.info-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 240px;
+  padding: 0.55rem 0.7rem;
+  background: #2d2a24;
+  color: #faf5ea;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+  white-space: normal;
+  text-align: left;
+}
+
+/* Little triangle on the bottom edge of the tooltip, pointing at the icon. */
+.info-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #2d2a24;
+}
+
+.info:hover .info-tooltip,
+.info:focus-within .info-tooltip {
+  opacity: 1;
+}
+
+/* An inline-style "i" used in the intro copy to reference the tooltip icon. */
+.inline-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--text-primary);
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  vertical-align: middle;
+  line-height: 1;
+}

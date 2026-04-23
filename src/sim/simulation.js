@@ -114,10 +114,16 @@ export class Simulation {
         const traitValue = org[this.config.TRAIT_NAME]
         this.world.clear(org.x, org.y)
         this.deadOrganisms.push({
+          id: org.id,              // keep same id → React keeps the same DOM node
           x: org.x,
           y: org.y,
           framesLeft: this.config.DEATH_ANIMATION_FRAMES,
           trait: Math.trunc(traitValue),
+          speed: org.speed,        // preserve size for the death animation
+          // Preserve the organism's last-facing direction so the death
+          // animation can render eyes looking the way the organism was
+          // heading when it died.
+          direction: [...org.lastDirection],
         })
       }
     }
@@ -135,17 +141,22 @@ export class Simulation {
   // Compute proportions of each possible trait value among living organisms.
   // Returns an array aligned with TRAIT_POSSIBLE_VALUES[traitName].
   getTraitDistribution() {
+    const counts = this.getTraitCounts()
+    const total = this.organisms.length
+    return counts.map((c) => (total > 0 ? c / total : 0))
+  }
+
+  // Raw counts per trait value, same ordering as TRAIT_POSSIBLE_VALUES[trait].
+  // Used by the live population graph to track absolute numbers over time.
+  getTraitCounts() {
     const traitName = this.config.TRAIT_NAME
     const possible = TRAIT_POSSIBLE_VALUES[traitName] || []
     const counts = Object.fromEntries(possible.map((v) => [v, 0]))
-    const total = this.organisms.length
-
     for (const org of this.organisms) {
       const v = org[traitName]
       if (v in counts) counts[v]++
     }
-
-    return possible.map((v) => (total > 0 ? counts[v] / total : 0))
+    return possible.map((v) => counts[v])
   }
 
   // Snapshot of the current state, shaped exactly like the old Flask /state
@@ -171,20 +182,52 @@ export class Simulation {
       food.push(row)
     }
 
+    // ---------- organism list (the renderer's source of truth) ----------
+    // Each organism gets one entry (alive or dying). id is stable across
+    // frames, which lets React keep the same DOM node for each organism —
+    // that's what makes CSS transitions animate position changes smoothly
+    // rather than remounting at the destination cell.
+    const organismList = []
+
     for (const org of this.organisms) {
       if (org.x >= 0 && org.x < c.WIDTH && org.y >= 0 && org.y < c.HEIGHT) {
         const traitInt = Math.trunc(org[c.TRAIT_NAME])
         grid[org.y][org.x] = String(traitInt)
+        organismList.push({
+          id: org.id,
+          x: org.x,
+          y: org.y,
+          trait: traitInt,
+          direction: [...org.lastDirection],
+          speed: org.speed,
+          alive: true,
+          ate: org.ateThisStep,
+          reproduced: org.reproducedThisStep,
+          // Rounded so the label doesn't flicker with float jitter (energy
+          // costs are 1/efficiency — rarely clean numbers).
+          energy: Math.round(org.energy * 10) / 10,
+        })
       }
     }
 
-    // Dead layer: keyed by "x,y" with progress 0..1 (0 = just died, 1 = gone).
+    // Dead layer: kept as a position-keyed map (back-compat) AND surfaced
+    // into the organismList with a deathProgress field so the renderer can
+    // animate death on the same DOM node the organism was using.
     const dead = {}
     for (const corpse of this.deadOrganisms) {
-      const { x, y, framesLeft, trait } = corpse
+      const { id, x, y, framesLeft, trait, direction, speed } = corpse
       if (x >= 0 && x < c.WIDTH && y >= 0 && y < c.HEIGHT) {
         const progress = 1 - framesLeft / c.DEATH_ANIMATION_FRAMES
-        dead[`${x},${y}`] = { progress, trait }
+        dead[`${x},${y}`] = { progress, trait, direction: direction || [0, -1] }
+        organismList.push({
+          id,
+          x, y,
+          trait,
+          direction: direction || [0, -1],
+          speed: speed || 1,
+          alive: false,
+          deathProgress: progress,
+        })
       }
     }
 
@@ -193,9 +236,11 @@ export class Simulation {
       food,
       alive: this.organisms.length > 0,
       trait_distribution: this.getTraitDistribution(),
+      trait_counts: this.getTraitCounts(),
       trait_name: c.TRAIT_NAME,
       trait_labels: labelsFor(c.TRAIT_NAME),
       dead,
+      organisms: organismList,
     }
   }
 }

@@ -7,24 +7,6 @@ generation under selection pressure.
 
 Live: https://ahopper17.github.io/naturalselectionsim/
 
-## Getting started
-
-```bash
-npm install
-npm run dev
-```
-
-Then open http://localhost:5173.
-
-## Building / deploying
-
-```bash
-npm run build     # produces dist/
-npm run deploy    # builds and pushes dist/ to the gh-pages branch
-```
-
-See [GITHUB_PAGES_SETUP.md](./GITHUB_PAGES_SETUP.md) for the full deploy
-workflow (automatic via GitHub Actions on every push to `main`).
 
 ## Project layout
 
